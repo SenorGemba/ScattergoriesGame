@@ -58,6 +58,103 @@
             opacity: 0.8;
         }
 
+        .saved-lists-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #0D1321;
+        }
+
+        .saved-lists-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .saved-lists-title {
+            font-size: 1.2rem;
+            color: #0D1321;
+            font-weight: 600;
+        }
+
+        .save-current-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .save-input {
+            flex: 1;
+            min-width: 150px;
+            padding: 8px 12px;
+            border: 2px solid #0D1321;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            color: #0D1321;
+        }
+
+        .btn-save {
+            padding: 8px 16px;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .saved-lists {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .saved-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #FFEDDF;
+            border-radius: 8px;
+            gap: 10px;
+        }
+
+        .saved-list-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .saved-list-name {
+            font-weight: 600;
+            color: #0D1321;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .saved-list-count {
+            font-size: 12px;
+            color: #0D1321;
+            opacity: 0.7;
+        }
+
+        .saved-list-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
         .input-section {
             margin-bottom: 30px;
         }
@@ -66,10 +163,12 @@
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
         input[type="text"] {
             flex: 1;
+            min-width: 200px;
             padding: 14px 20px;
             border: 2px solid #0D1321;
             border-radius: 10px;
@@ -97,6 +196,7 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
 
         .btn-primary {
@@ -155,6 +255,7 @@
             box-shadow: 0 2px 4px rgba(13, 19, 33, 0.1);
             transition: all 0.3s ease;
             animation: slideIn 0.3s ease-out;
+            gap: 10px;
         }
 
         @keyframes slideIn {
@@ -176,6 +277,11 @@
         .topic-text {
             color: #0D1321;
             font-size: 16px;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .btn-remove {
@@ -183,6 +289,7 @@
             font-size: 14px;
             background: #0D1321;
             color: #FFEDDF;
+            flex-shrink: 0;
         }
 
         .btn-remove:hover {
@@ -281,15 +388,66 @@
 
         @media (max-width: 600px) {
             .container {
-                padding: 25px;
+                padding: 20px;
             }
             
             h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+                margin-bottom: 20px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+
+            input[type="text"] {
+                min-width: 100%;
+                width: 100%;
+            }
+
+            button {
+                width: 100%;
+                padding: 14px 20px;
+            }
+
+            .btn-generate {
+                padding: 16px;
+                font-size: 16px;
+            }
+
+            .saved-lists-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .save-current-group {
+                max-width: 100%;
+                flex-direction: column;
+            }
+
+            .save-input {
+                width: 100%;
+            }
+
+            .saved-list-actions {
+                justify-content: flex-end;
             }
             
             .game-topics {
                 grid-template-columns: 1fr;
+            }
+
+            .topic-text {
+                font-size: 14px;
+            }
+
+            .btn-remove {
+                padding: 8px 12px;
+                font-size: 12px;
             }
         }
     </style>
@@ -300,6 +458,22 @@
             <h1>Scattergories Topic Generator</h1>
             <p class="subtitle">Create your custom topics and generate a random game list</p>
             
+            <div class="saved-lists-section">
+                <div class="saved-lists-header">
+                    <span class="saved-lists-title">Saved Topic Lists</span>
+                    <div class="save-current-group">
+                        <input 
+                            type="text" 
+                            class="save-input"
+                            id="saveListName" 
+                            placeholder="Name this list..."
+                        >
+                        <button class="btn-primary btn-save" onclick="saveCurrentList()">Save List</button>
+                    </div>
+                </div>
+                <div class="saved-lists" id="savedLists"></div>
+            </div>
+
             <div class="input-section">
                 <div class="input-group">
                     <input 
@@ -336,6 +510,7 @@
 
     <script>
         let topics = [];
+        let savedTopicLists = JSON.parse(localStorage.getItem('scattergoriesLists')) || {};
 
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
@@ -395,6 +570,64 @@
             }
         }
 
+        function saveCurrentList() {
+            const nameInput = document.getElementById('saveListName');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                alert('Please enter a name for this list');
+                return;
+            }
+            
+            if (topics.length === 0) {
+                alert('Please add some topics before saving');
+                return;
+            }
+            
+            savedTopicLists[name] = [...topics];
+            localStorage.setItem('scattergoriesLists', JSON.stringify(savedTopicLists));
+            nameInput.value = '';
+            renderSavedLists();
+        }
+
+        function loadList(name) {
+            topics = [...savedTopicLists[name]];
+            renderTopics();
+            updateCounter();
+            updateGenerateButton();
+        }
+
+        function deleteList(name) {
+            if (confirm(`Delete the list "${name}"?`)) {
+                delete savedTopicLists[name];
+                localStorage.setItem('scattergoriesLists', JSON.stringify(savedTopicLists));
+                renderSavedLists();
+            }
+        }
+
+        function renderSavedLists() {
+            const savedListsContainer = document.getElementById('savedLists');
+            const listNames = Object.keys(savedTopicLists);
+            
+            if (listNames.length === 0) {
+                savedListsContainer.innerHTML = '<div class="empty-state">No saved lists yet</div>';
+                return;
+            }
+            
+            savedListsContainer.innerHTML = listNames.map(name => `
+                <div class="saved-list-item">
+                    <div class="saved-list-info">
+                        <div class="saved-list-name">${name}</div>
+                        <div class="saved-list-count">${savedTopicLists[name].length} topics</div>
+                    </div>
+                    <div class="saved-list-actions">
+                        <button class="btn-primary btn-small" onclick="loadList('${name}')">Load</button>
+                        <button class="btn-secondary btn-small" onclick="deleteList('${name}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         function generateGame() {
             if (topics.length < 12) return;
             
@@ -436,6 +669,7 @@
         renderTopics();
         updateCounter();
         updateGenerateButton();
+        renderSavedLists();
     </script>
 </body>
 </html>
