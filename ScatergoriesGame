@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scattergories Topic Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0D1321;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: #FFEDDF;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #0D1321;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #0D1321;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid #0D1321;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+            color: #0D1321;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #C5D86D;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(197, 216, 109, 0.2);
+        }
+
+        button {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: #C5D86D;
+            color: #0D1321;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(197, 216, 109, 0.3);
+            background: #b3c75f;
+        }
+
+        .btn-secondary {
+            background: #0D1321;
+            color: #FFEDDF;
+        }
+
+        .btn-secondary:hover {
+            background: #1a2438;
+            transform: translateY(-2px);
+        }
+
+        .btn-generate {
+            width: 100%;
+            margin-top: 20px;
+            padding: 18px;
+            font-size: 18px;
+            background: #C5D86D;
+            color: #0D1321;
+        }
+
+        .btn-generate:hover {
+            box-shadow: 0 15px 35px rgba(197, 216, 109, 0.3);
+            background: #b3c75f;
+        }
+
+        .topics-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #0D1321;
+        }
+
+        .topic-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background: #FFEDDF;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(13, 19, 33, 0.1);
+            transition: all 0.3s ease;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .topic-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(13, 19, 33, 0.2);
+        }
+
+        .topic-text {
+            color: #0D1321;
+            font-size: 16px;
+        }
+
+        .btn-remove {
+            padding: 6px 12px;
+            font-size: 14px;
+            background: #0D1321;
+            color: #FFEDDF;
+        }
+
+        .btn-remove:hover {
+            background: #1a2438;
+            box-shadow: 0 5px 15px rgba(13, 19, 33, 0.3);
+        }
+
+        .game-section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .game-topics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .game-topic-card {
+            background: #0D1321;
+            color: #FFEDDF;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(13, 19, 33, 0.3);
+            transition: all 0.3s ease;
+            animation: popIn 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .game-topic-card:nth-child(1) { animation-delay: 0.1s; }
+        .game-topic-card:nth-child(2) { animation-delay: 0.2s; }
+        .game-topic-card:nth-child(3) { animation-delay: 0.3s; }
+        .game-topic-card:nth-child(4) { animation-delay: 0.4s; }
+        .game-topic-card:nth-child(5) { animation-delay: 0.5s; }
+        .game-topic-card:nth-child(6) { animation-delay: 0.6s; }
+        .game-topic-card:nth-child(7) { animation-delay: 0.7s; }
+        .game-topic-card:nth-child(8) { animation-delay: 0.8s; }
+        .game-topic-card:nth-child(9) { animation-delay: 0.9s; }
+        .game-topic-card:nth-child(10) { animation-delay: 1.0s; }
+        .game-topic-card:nth-child(11) { animation-delay: 1.1s; }
+        .game-topic-card:nth-child(12) { animation-delay: 1.2s; }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .game-topic-card:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(13, 19, 33, 0.4);
+        }
+
+        .game-topic-number {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+            color: #C5D86D;
+        }
+
+        .counter {
+            text-align: center;
+            color: #0D1321;
+            font-size: 14px;
+            margin-top: 10px;
+            opacity: 0.7;
+        }
+
+        .btn-back {
+            background: #0D1321;
+            color: #FFEDDF;
+            margin-bottom: 20px;
+        }
+
+        .btn-back:hover {
+            background: #1a2438;
+            box-shadow: 0 10px 25px rgba(13, 19, 33, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #0D1321;
+            padding: 40px;
+            font-size: 18px;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .game-topics {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="setup-section" id="setupSection">
+            <h1>Scattergories Topic Generator</h1>
+            <p class="subtitle">Create your custom topics and generate a random game list</p>
+            
+            <div class="input-section">
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        id="topicInput" 
+                        placeholder="Enter a topic (e.g., 'Things found in a kitchen')"
+                        onkeypress="handleKeyPress(event)"
+                    >
+                    <button class="btn-primary" onclick="addTopic()">Add Topic</button>
+                </div>
+                
+                <div class="topics-list" id="topicsList"></div>
+                
+                <div class="counter" id="counter">0 topics added</div>
+                
+                <button class="btn-primary btn-generate" onclick="generateGame()" id="generateBtn" disabled>
+                    Generate Game (12 Topics)
+                </button>
+            </div>
+        </div>
+        
+        <div class="game-section" id="gameSection">
+            <button class="btn-secondary btn-back" onclick="backToSetup()">Back to Topics</button>
+            <h1>Your Game Topics</h1>
+            <p class="subtitle">Here are your 12 randomly selected topics</p>
+            
+            <div class="game-topics" id="gameTopics"></div>
+            
+            <button class="btn-primary btn-generate" onclick="regenerateGame()">
+                Shuffle Topics
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let topics = [];
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                addTopic();
+            }
+        }
+
+        function addTopic() {
+            const input = document.getElementById('topicInput');
+            const topic = input.value.trim();
+            
+            if (topic && !topics.includes(topic)) {
+                topics.push(topic);
+                input.value = '';
+                renderTopics();
+                updateCounter();
+                updateGenerateButton();
+            }
+        }
+
+        function removeTopic(index) {
+            topics.splice(index, 1);
+            renderTopics();
+            updateCounter();
+            updateGenerateButton();
+        }
+
+        function renderTopics() {
+            const topicsList = document.getElementById('topicsList');
+            
+            if (topics.length === 0) {
+                topicsList.innerHTML = '<div class="empty-state">No topics added yet</div>';
+                return;
+            }
+            
+            topicsList.innerHTML = topics.map((topic, index) => `
+                <div class="topic-item">
+                    <span class="topic-text">${topic}</span>
+                    <button class="btn-secondary btn-remove" onclick="removeTopic(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function updateCounter() {
+            const counter = document.getElementById('counter');
+            counter.textContent = `${topics.length} topic${topics.length !== 1 ? 's' : ''} added`;
+        }
+
+        function updateGenerateButton() {
+            const generateBtn = document.getElementById('generateBtn');
+            generateBtn.disabled = topics.length < 12;
+            
+            if (topics.length < 12) {
+                generateBtn.textContent = `Add ${12 - topics.length} more topic${12 - topics.length !== 1 ? 's' : ''}`;
+            } else {
+                generateBtn.textContent = 'Generate Game (12 Topics)';
+            }
+        }
+
+        function generateGame() {
+            if (topics.length < 12) return;
+            
+            const shuffled = [...topics].sort(() => Math.random() - 0.5);
+            const gameTopics = shuffled.slice(0, 12);
+            
+            displayGame(gameTopics);
+        }
+
+        function regenerateGame() {
+            generateGame();
+        }
+
+        function displayGame(gameTopics) {
+            const gameSection = document.getElementById('gameSection');
+            const setupSection = document.getElementById('setupSection');
+            const gameTopicsContainer = document.getElementById('gameTopics');
+            
+            gameTopicsContainer.innerHTML = gameTopics.map((topic, index) => `
+                <div class="game-topic-card">
+                    <div class="game-topic-number">Topic ${index + 1}</div>
+                    ${topic}
+                </div>
+            `).join('');
+            
+            setupSection.style.display = 'none';
+            gameSection.style.display = 'block';
+        }
+
+        function backToSetup() {
+            const gameSection = document.getElementById('gameSection');
+            const setupSection = document.getElementById('setupSection');
+            
+            gameSection.style.display = 'none';
+            setupSection.style.display = 'block';
+        }
+
+        // Initialize
+        renderTopics();
+        updateCounter();
+        updateGenerateButton();
+    </script>
+</body>
+</html>
